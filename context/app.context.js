@@ -12,6 +12,7 @@ const AppProvider = ({ children }) => {
 
 
     const [isAuth, setIsAuth] = useState(false);
+    const [accountId, setAccountId] = useState(null);
     const [account, setAccount] = useState(null);
     const [contract, setContract] = useState(null);
     const [walletConnection, setWalletConnection] = useState(null);
@@ -19,12 +20,13 @@ const AppProvider = ({ children }) => {
     const initNear = async () => {
         const near = await connect(Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig))
         const walletConnection = new WalletConnection(near)
-        const contract = await new Contract(walletConnection.account(), nearConfig.contractName, {
+        const account = walletConnection.account();
+        const contract = await new Contract(account, nearConfig.contractName, {
             viewMethods: ['getGreeting'],
             changeMethods: ['setGreeting'],
         })
 
-        return { walletConnection, accountId: walletConnection.getAccountId(), contract };
+        return { walletConnection, accountId: walletConnection.getAccountId(), contract, account };
     }
 
     const login = () => {
@@ -39,11 +41,12 @@ const AppProvider = ({ children }) => {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            initNear().then(({ walletConnection, accountId, contract }) => {
+            initNear().then(({ walletConnection, accountId, contract, account }) => {
                 setWalletConnection(walletConnection);
                 if (walletConnection.isSignedIn()) {
                     setIsAuth(true);
-                    setAccount(accountId);
+                    setAccountId(accountId);
+                    setAccount(account);
                     setContract(contract);
 
                 }
@@ -52,7 +55,7 @@ const AppProvider = ({ children }) => {
     }, [])
 
 
-    return <AppContext.Provider value={{ networkId: nearConfig.networkId, isAuth, login, logout, account, contract }}>{children}</AppContext.Provider>;
+    return <AppContext.Provider value={{ networkId: nearConfig.networkId, isAuth, login, logout, accountId, contract, account }}>{children}</AppContext.Provider>;
 };
 
 export default AppProvider;

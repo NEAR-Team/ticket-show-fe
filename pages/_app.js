@@ -1,8 +1,16 @@
-import AppProvider from '../context/app.context'
-import '../styles/globals.css'
+import NavBar from "../components/NavBar";
+import AppProvider from "../context/app.context";
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
-  return <AppProvider> <Component {...pageProps} /></AppProvider>
+  return (
+    <AppProvider>
+      <>
+        <NavBar />
+        <Component {...pageProps} />
+      </>
+    </AppProvider>
+  );
 }
 
-export default MyApp
+export default MyApp;

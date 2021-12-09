@@ -1,13 +1,10 @@
-import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import Slider from "react-slick";
 
-import { useCallback, useEffect, useState } from "react";
-import { useAppContext } from "../context/app.context";
-import { utils } from "near-api-js";
 import SvgWave from "../components/SvgWave";
 
 import {
@@ -41,9 +38,11 @@ export default function Home() {
               The ultimate solution for reliable and secure your event ticket
               delivery.
             </p>
-            <button className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-              Get in Touch
-            </button>
+            <Link href="/user-dashboard" passHref={true}>
+              <button className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                Get in Touch
+              </button>
+            </Link>
           </div>
 
           <div className="w-full md:w-3/5 py-6 text-center">

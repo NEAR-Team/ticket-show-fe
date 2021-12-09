@@ -12,7 +12,7 @@ const AppProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [accountId, setAccountId] = useState(null);
   const [account, setAccount] = useState(null);
-  const [contract, setContract] = useState(null);
+  const [mainContract, setMainContract] = useState(null);
   const [walletConnection, setWalletConnection] = useState(null);
 
   const initNear = async () => {
@@ -48,8 +48,8 @@ const AppProvider = ({ children }) => {
     const account = walletConnection.account();
 
     const contract = await new Contract(account, contractName, {
-      viewMethods: [],
-      changeMethods: ["create_new_show"],
+      viewMethods: ["show_metadata", "get_tickets_by_owner"],
+      changeMethods: ["create_new_show", "buy_ticket"],
     });
 
     return {
@@ -78,11 +78,11 @@ const AppProvider = ({ children }) => {
     if (typeof window !== "undefined") {
       initNear().then(({ walletConnection, accountId, contract, account }) => {
         setWalletConnection(walletConnection);
+        setMainContract(contract);
         if (walletConnection.isSignedIn()) {
           setIsAuth(true);
           setAccountId(accountId);
           setAccount(account);
-          setContract(contract);
         }
       });
     }
@@ -96,9 +96,10 @@ const AppProvider = ({ children }) => {
         login,
         logout,
         accountId,
-        mainContract: contract,
+        mainContract,
         account,
         connectContract,
+        walletConnection,
       }}
     >
       {children}

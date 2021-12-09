@@ -2,13 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAppContext } from "../context/app.context";
 import { useEffect, useState } from "react";
-
+import { useRouter } from "next/router";
 import clsx from "clsx";
 
 export default function NavBar() {
-  const { isAuth, login } = useAppContext();
+  const { isAuth, login, logout } = useAppContext();
   const [active, setActive] = useState(false);
   const [scroll, setScroll] = useState(false);
+
+  const router = useRouter();
   const handleClick = () => {
     setActive(!active);
   };
@@ -25,6 +27,15 @@ export default function NavBar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleAuth = () => {
+    if (isAuth) {
+      logout();
+      router.replace("/");
+    } else {
+      login();
+    }
+  };
 
   return (
     <nav
@@ -112,6 +123,7 @@ export default function NavBar() {
               scroll ? "gradient text-white" : "bg-white text-gray-800",
               "font-bold rounded-full mt-4 lg:mt-0 py-2 px-4 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
             )}
+            onClick={handleAuth}
           >
             {!isAuth ? "Login with Near" : "Logout"}
           </button>

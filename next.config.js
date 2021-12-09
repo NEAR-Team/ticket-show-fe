@@ -1,6 +1,6 @@
 module.exports = {
   reactStrictMode: true,
   env: {
-    CONTRACT_NAME: 'ainetwork.testnet',
+    CONTRACT_NAME: "mint.tronginc.testnet", //'ainetwork.testnet',
   },
-}
+};

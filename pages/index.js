@@ -1,6 +1,9 @@
 import Head from "next/head";
 import Image from "next/image";
-import styles from "../styles/Home.module.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+import Slider from "react-slick";
 
 import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../context/app.context";
@@ -13,45 +16,16 @@ import {
   FcCustomerSupport,
 } from "react-icons/fc";
 
+const settings = {
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  arrows: false,
+  autoplay: true,
+};
+
 export default function Home() {
-  const { login, isAuth, logout, accountId, account, contract } =
-    useAppContext();
-  const [balance, setBalance] = useState(0);
-  const [message, setMessage] = useState("");
-
-  const getMessage = useCallback(async () => {
-    if (contract) {
-      const _mess = await contract.getGreeting({ accountId });
-      setMessage(_mess);
-    }
-  }, [accountId, contract]);
-
-  useEffect(() => {
-    if (account) {
-      account.getAccountBalance().then((res) => {
-        setBalance(res);
-      });
-      getMessage();
-    }
-  }, [account, getMessage]);
-
-  const sendMoney = () => {
-    account.sendMoney(
-      "characterbin.testnet",
-      utils.format.parseNearAmount("149")
-    );
-  };
-
-  const setGreeting = async () => {
-    if (contract) {
-      const _mess = await contract.setGreeting({ message });
-      console.log(_mess);
-    }
-  };
-  const handleChange = (e) => {
-    setMessage(e.target.value);
-  };
-
   return (
     <>
       <div className="pt-24">
@@ -139,6 +113,67 @@ export default function Home() {
                   24/7 support for your event ticketing needs.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="text-gray-600 body-font bg-white">
+        <div className="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
+          <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
+            <Slider {...settings}>
+              <div>
+                <Image
+                  src="/assets/usecase-audio-obscura.24950ea-1600.jpg"
+                  width={1600}
+                  height={1066}
+                  alt="usecase-audio-obscura"
+                  layout="responsive"
+                />
+              </div>
+              <div>
+                <Image
+                  src="/assets/usecase-guus-meeuwis-groots.eb3a4f6-1600.jpg"
+                  width={1600}
+                  height={1066}
+                  alt="usecase-guus-meeuwis-groots"
+                  layout="responsive"
+                />
+              </div>
+              <div>
+                <Image
+                  src="/assets/usecase-jochem-myjer-in-carre.b2c66f2-1600.jpg"
+                  width={1600}
+                  height={1066}
+                  alt="usecase-jochem-myjer-in-carre"
+                  layout="responsive"
+                />
+              </div>
+              <div>
+                <Image
+                  src="/assets/usecase-livestreams.f11b078-1600.jpg"
+                  width={1600}
+                  height={1066}
+                  alt="usecase-livestreams"
+                  layout="responsive"
+                />
+              </div>
+            </Slider>
+          </div>
+          <div className="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
+            <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
+              Ready for your next event?
+            </h1>
+            <p className="mb-8 leading-relaxed">
+              We are confident that we are the future of ticketing and we plan
+              on taking over the world.
+            </p>
+            <div className="flex justify-center">
+              <button className="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+                Start selling ticket
+              </button>
+              <button className="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-gray-200 rounded text-lg">
+                Support
+              </button>
             </div>
           </div>
         </div>

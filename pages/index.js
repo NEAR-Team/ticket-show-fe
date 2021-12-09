@@ -49,11 +49,12 @@ export default function Home() {
           <div className="w-full md:w-3/5 py-6 text-center">
             <Image
               layout="responsive"
-              src="/assets/hero.png"
+              src="/assets/hero.svg"
               width={613}
               height={529}
               className="w-full md:w-4/5"
               alt="Hero"
+              priority={true}
             />
           </div>
         </div>

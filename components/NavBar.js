@@ -41,7 +41,8 @@ export default function NavBar() {
     <nav
       className={clsx(
         scroll && "bg-white shadow",
-        "fixed w-full z-30 top-0 text-white inset-x-0"
+        "fixed w-full z-30 top-0 text-white inset-x-0",
+        active && "text-gray-800"
       )}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">

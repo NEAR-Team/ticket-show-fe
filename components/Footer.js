@@ -5,7 +5,7 @@ import clsx from "clsx";
 export default function Footer() {
   return (
     <footer className=" body-font bg-gray-900 text-gray-300">
-      <div className="container px-5 py-24 mx-auto">
+      <div className="container px-5 py-20 mx-auto">
         <div className="flex flex-wrap md:text-left text-center order-first">
           <div className="lg:w-1/5 md:w-1/2 w-full px-4">
             <h2 className="title-font font-medium text-gray-900 tracking-widest text-sm mb-3 uppercase">
@@ -74,7 +74,7 @@ export default function Footer() {
                   className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
-              <button className="lg:mt-2 xl:mt-0 flex-shrink-0 inline-flex text-white bg-orange-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+              <button className="lg:mt-2 xl:mt-0 flex-shrink-0 inline-flex text-white bg-yellow-500 border-0 py-2 px-6 focus:outline-none hover:bg-yellow-600 rounded">
                 SUBSCRIBE
               </button>
             </div>
@@ -83,24 +83,19 @@ export default function Footer() {
       </div>
       <div className="bg-gray-100">
         <div className="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
-          <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
-            <Link passHref href="/">
-              <a
-                className={
-                  "text-gray-800toggleColour  no-underline hover:no-underline font-bold text-2xl flex items-center"
-                }
-              >
-                <Image
-                  layout="fixed"
-                  src="/assets/ticket.png"
-                  height={128 / 3}
-                  width={128 / 3}
-                  alt="logo"
-                />
-              </a>
-            </Link>
-            <span className="ml-3 text-xl">B-EVENT</span>
-          </a>
+          <Link passHref href="/">
+            <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
+              <Image
+                layout="fixed"
+                src="/assets/ticket.png"
+                height={128 / 3}
+                width={128 / 3}
+                alt="logo"
+              />
+
+              <span className="ml-3 text-xl">B-EVENT</span>
+            </a>
+          </Link>
           <p className="text-sm text-gray-500 sm:ml-6 sm:mt-0 mt-4">
             © 2020 B-Event —
             <a

@@ -26,7 +26,30 @@ const AppProvider = ({ children }) => {
     const account = walletConnection.account();
     const contract = await new Contract(account, nearConfig.contractName, {
       viewMethods: ["nft_token"],
-      changeMethods: ["nft_transfer", "mint", "nft_mint"],
+      changeMethods: ["create_new_ticket_contract"],
+    });
+
+    return {
+      walletConnection,
+      accountId: walletConnection.getAccountId(),
+      contract,
+      account,
+    };
+  };
+
+  const connectContract = async (contractName) => {
+    const near = await connect(
+      Object.assign(
+        { deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } },
+        nearConfig
+      )
+    );
+    const walletConnection = new WalletConnection(near);
+    const account = walletConnection.account();
+
+    const contract = await new Contract(account, contractName, {
+      viewMethods: [],
+      changeMethods: ["create_new_show"],
     });
 
     return {
@@ -38,7 +61,12 @@ const AppProvider = ({ children }) => {
   };
 
   const login = () => {
-    walletConnection.requestSignIn(nearConfig.contractName);
+    // walletConnection.requestSignIn(nearConfig.contractName);
+    walletConnection.requestSignIn({
+      contractId: nearConfig.contractName,
+      successUrl: `${process.env.domain}/user-dashboard`,
+      failureUrl: process.env.domain,
+    });
   };
 
   const logout = () => {
@@ -68,8 +96,9 @@ const AppProvider = ({ children }) => {
         login,
         logout,
         accountId,
-        contract,
+        mainContract: contract,
         account,
+        connectContract,
       }}
     >
       {children}

@@ -65,8 +65,12 @@ export default function MyCompany() {
 
   return (
     <UserLayout activeIndex={0}>
-      <div className="space-y-3">
-        <h1 className="uppercase">My Company</h1>
+      <div className="space-y-3 border p-5 shadow">
+        <div className="flex flex-row justify-between items-center">
+          <h1 className="uppercase text-indigo-700 font-medium text-xl">
+            My Company
+          </h1>
+        </div>
         <div className="space-y-3">
           <div className="flex  w-full p-3">
             <form className="w-1/2" onSubmit={handleSubmit(onSubmit)}>

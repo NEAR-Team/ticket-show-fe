@@ -1,6 +1,9 @@
 const { utils } = require("near-api-js");
 
 module.exports = {
+  images: {
+    domains: ["dummyimage.com"],
+  },
   reactStrictMode: true,
   env: {
     CONTRACT_NAME: "ainetwork.testnet",

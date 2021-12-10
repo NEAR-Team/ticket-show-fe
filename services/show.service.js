@@ -35,7 +35,7 @@ export const setShow = async ({ show_id, owner_id, ...metadata }) => {
   if (!owner_id) {
     throw "Show must have owner_id";
   }
-  const doc = { owner_id, ...metadata, createdAt: Timestamp.now() };
+  const doc = { show_id, owner_id, ...metadata, createdAt: Timestamp.now() };
   await companyRef.doc(show_id).set(doc);
   doc.show_id = show_id;
   return doc;

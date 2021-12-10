@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAppContext } from "../../context/app.context";
+import { useAppContext } from "../context/app.context";
 import { utils, providers } from "near-api-js";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
@@ -100,13 +100,6 @@ export default function TestContract() {
     const { walletConnection, accountId, contract, account } =
       await connectContract(contractName);
 
-    if (!walletConnection.isSignedIn()) {
-      walletConnection.requestSignIn({
-        contractId: contractName,
-        successUrl: `${process.env.domain}/user-dashboard`,
-        failureUrl: process.env.domain,
-      });
-    }
     const result = await contract.show_metadata({ show_id });
     console.log(result);
   };

@@ -6,7 +6,7 @@ module.exports = {
   },
   reactStrictMode: true,
   env: {
-    CONTRACT_NAME: "ainetwork.testnet",
+    CONTRACT_NAME: "cong_ty_2.ainetwork.testnet",
     domain: "http://localhost:3000",
     CONTRACT_CREATE_FEE: utils.format.parseNearAmount("11.5"),
   },
@@ -14,7 +14,7 @@ module.exports = {
     return [
       {
         source: "/user-dashboard",
-        destination: "/user-dashboard/my-company",
+        destination: "/user-dashboard/my-show",
         permanent: true,
       },
     ];

@@ -25,8 +25,8 @@ const AppProvider = ({ children }) => {
     const walletConnection = new WalletConnection(near);
     const account = walletConnection.account();
     const contract = await new Contract(account, nearConfig.contractName, {
-      viewMethods: ["nft_token"],
-      changeMethods: ["create_new_ticket_contract"],
+      viewMethods: ["show_metadata", "get_tickets_by_owner"],
+      changeMethods: ["create_new_show", "buy_ticket"],
     });
 
     return {

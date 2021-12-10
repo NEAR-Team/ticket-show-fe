@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import { MdModeEditOutline } from "react-icons/md";
 import Modal from "react-modal";
-
+import Button from "@material-tailwind/react/Button";
 Modal.setAppElement("#__next");
 
 export default function MyShow() {
@@ -73,12 +73,12 @@ export default function MyShow() {
             My Show
           </h1>
           <div>
-            <button
+            <Button
               className=" text-blue-500 border px-3 py-2 rounded hover:bg-indigo-500 hover:text-white"
               onClick={handleNewShow}
             >
               Create new show
-            </button>
+            </Button>
           </div>
         </div>
         <div className="space-y-3">

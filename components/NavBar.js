@@ -90,9 +90,14 @@ export default function NavBar() {
         >
           <ul className="items-center justify-end flex-1 list-reset lg:flex">
             <li className="mr-3">
-              <a className="inline-block px-4 py-2 font-bold no-underline" href="#">
-                Home
-              </a>
+              <Link passHref href="/">
+                <a
+                  className="inline-block px-4 py-2 font-bold no-underline"
+                  href="#"
+                >
+                  Home
+                </a>
+              </Link>
             </li>
             <li className="mr-3">
               <Link passHref href="/white-paper">

@@ -15,11 +15,21 @@ import ModalFooter from "@material-tailwind/react/ModalFooter";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-toastify";
 
+import CssLoading from "../../components/Loading";
+
 export default function MyShow() {
-  const { accountId, isAuth, ticketContract, mainContract, connectContract } =
-    useAppContext();
+  const {
+    accountId,
+    isAuth,
+
+    mainContract,
+    connectContract,
+    getContractTicket,
+  } = useAppContext();
   const [shows, setShows] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [ticketContract, setTicketContract] = useState(null);
 
   const {
     register,
@@ -56,13 +66,13 @@ export default function MyShow() {
   }, [accountId, connectContract, mainContract]);
 
   useEffect(() => {
-    console.log("xx");
     getMyShow();
   }, [getCompany, getMyShow]);
 
   const handleNewShow = async () => {
     if (!ticketContract) {
-      await getCompany();
+      const _ticketContract = await getContractTicket();
+      setTicketContract(_ticketContract);
     }
     setShowModal(true);
   };
@@ -87,8 +97,8 @@ export default function MyShow() {
         dayjs(data.selling_start_time).unix() + "000000000"
       ),
     };
-    console.log(ticketContract);
     try {
+      setLoading(true);
       await fetch("/api/shows", {
         method: "post",
         headers: {
@@ -99,13 +109,14 @@ export default function MyShow() {
 
       await ticketContract.create_new_show(submitData);
       toast.success("Show created successfully");
+      setShowModal(false);
+      reset();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-    setShowModal(false);
-    reset();
   };
 
   return (
@@ -286,7 +297,7 @@ export default function MyShow() {
           </Button>
 
           <Button color="green" type="submit" form="hook-form" ripple="light">
-            Save
+            {loading && <CssLoading className="font-sm" />} Save
           </Button>
         </ModalFooter>
       </Modal>

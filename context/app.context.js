@@ -38,6 +38,17 @@ const AppProvider = ({ children }) => {
     };
   };
 
+  const getContractTicket = async () => {
+    if (mainContract && accountId) {
+      const company = await mainContract.get_contracts_by_owner({
+        owner_id: accountId,
+      });
+      if (company.length > 0) {
+        return connectContract(company[0]);
+      }
+    }
+  };
+
   const connectContract = async (contractName) => {
     const near = await connect(
       Object.assign(
@@ -105,6 +116,7 @@ const AppProvider = ({ children }) => {
         connectContract,
         walletConnection,
         ticketContract,
+        getContractTicket,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import UserLayout from "../../components/UserLayout";
 import { useAppContext } from "../../context/app.context";
@@ -15,15 +15,21 @@ export default function MyCompany() {
   const { query, replace, pathname } = useRouter();
   const [company, setCompany] = useState(null);
 
-  const getCompany = async () => {
+  const getCompany = useCallback(async () => {
+    if (mainContract && accountId) {
+      const company = await mainContract.get_contracts_by_owner({
+        owner_id: accountId,
+      });
+      console.log(company);
+    }
     // setCompany({
     //   name: "MTP Entertaiment",
     // });
-  };
+  }, [accountId, mainContract]);
 
   useEffect(() => {
     getCompany();
-  }, []);
+  }, [getCompany]);
 
   useEffect(() => {
     const { errorCode, errorMessage, transactionHashes } = query;

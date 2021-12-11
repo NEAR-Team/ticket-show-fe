@@ -14,8 +14,10 @@ import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-toastify";
+
 export default function MyShow() {
-  const { accountId, isAuth, mainContract } = useAppContext();
+  const { accountId, isAuth, ticketContract, mainContract, connectContract } =
+    useAppContext();
   const [shows, setShows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -42,12 +44,26 @@ export default function MyShow() {
     }
   }, [accountId]);
 
-  useEffect(() => {
-    getMyShow();
-  }, [getMyShow]);
+  const getCompany = useCallback(async () => {
+    if (mainContract && accountId) {
+      const company = await mainContract.get_contracts_by_owner({
+        owner_id: accountId,
+      });
+      if (company.length > 0) {
+        await connectContract(company[0]);
+      }
+    }
+  }, [accountId, connectContract, mainContract]);
 
-  const handleNewShow = () => {
-    console.log("edit show");
+  useEffect(() => {
+    console.log("xx");
+    getMyShow();
+  }, [getCompany, getMyShow]);
+
+  const handleNewShow = async () => {
+    if (!ticketContract) {
+      await getCompany();
+    }
     setShowModal(true);
   };
 
@@ -71,6 +87,7 @@ export default function MyShow() {
         dayjs(data.selling_start_time).unix() + "000000000"
       ),
     };
+    console.log(ticketContract);
     try {
       await fetch("/api/shows", {
         method: "post",
@@ -80,13 +97,15 @@ export default function MyShow() {
         body: JSON.stringify({ ...submitData, owner_id: accountId }),
       }).then((res) => res.json());
 
-      await mainContract.create_new_show(submitData);
+      await ticketContract.create_new_show(submitData);
+      toast.success("Show created successfully");
     } catch (error) {
       console.error(error);
+      toast.error("Something went wrong");
     }
 
-    // setShowModal(false);
-    // reset();
+    setShowModal(false);
+    reset();
   };
 
   return (
@@ -104,12 +123,12 @@ export default function MyShow() {
           <div className="flex w-full">
             <section className="text-gray-600 body-font">
               <div className="container py-5 mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   {shows &&
                     shows.length > 0 &&
                     shows.map((show, index) => (
                       <div key={show.show_id} className="p-4 w-full">
-                        <Link href="/">
+                        <Link href={`/show/${show.show_id}`}>
                           <a className="block relative h-40 rounded overflow-hidden">
                             <Image
                               alt="ecommerce"
@@ -121,7 +140,7 @@ export default function MyShow() {
                           </a>
                         </Link>
                         <div>
-                          <h2 className="text-gray-900 title-font text-lg font-medium uppercase">
+                          <h2 className="text-gray-900 title-font text-lg font-medium uppercase pt-4">
                             {show.show_title}
                           </h2>
                           <p className="mt-1 text-right text-sm italic">
@@ -132,7 +151,7 @@ export default function MyShow() {
                           </p>
                         </div>
                         <div>
-                          <button className="border p-1 rounded-full hover:text-white hover:bg-indigo-500">
+                          <button className="border p-1 rounded-full hover:text-white hover:bg-indigo-500 outline-none hover:outline-none focus:outline-none">
                             <MdModeEditOutline />
                           </button>
                         </div>

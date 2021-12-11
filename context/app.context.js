@@ -14,6 +14,7 @@ const AppProvider = ({ children }) => {
   const [account, setAccount] = useState(null);
   const [mainContract, setMainContract] = useState(null);
   const [walletConnection, setWalletConnection] = useState(null);
+  const [ticketContract, setTicketContract] = useState(null);
 
   const initNear = async () => {
     const near = await connect(
@@ -25,8 +26,8 @@ const AppProvider = ({ children }) => {
     const walletConnection = new WalletConnection(near);
     const account = walletConnection.account();
     const contract = await new Contract(account, nearConfig.contractName, {
-      viewMethods: ["show_metadata", "get_tickets_by_owner"],
-      changeMethods: ["create_new_show", "buy_ticket"],
+      viewMethods: ["get_contracts_by_owner"],
+      changeMethods: ["create_new_ticket_contract"],
     });
 
     return {
@@ -48,16 +49,19 @@ const AppProvider = ({ children }) => {
     const account = walletConnection.account();
 
     const contract = await new Contract(account, contractName, {
-      viewMethods: ["show_metadata", "get_tickets_by_owner"],
-      changeMethods: ["create_new_show", "buy_ticket"],
+      viewMethods: [
+        "show_metadata",
+        "get_active_shows",
+        "get_all_shows",
+        "ticket_metadata",
+        "get_tickets_by_owner",
+        "ticket_contract_metadata",
+      ],
+      changeMethods: ["create_new_show", "buy_ticket", "check_ticket"],
     });
 
-    return {
-      walletConnection,
-      accountId: walletConnection.getAccountId(),
-      contract,
-      account,
-    };
+    setTicketContract(contract);
+    return contract;
   };
 
   const login = () => {
@@ -100,6 +104,7 @@ const AppProvider = ({ children }) => {
         account,
         connectContract,
         walletConnection,
+        ticketContract,
       }}
     >
       {children}

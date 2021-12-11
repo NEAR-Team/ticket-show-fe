@@ -8,7 +8,7 @@ export default function UserLayout({ children, activeIndex }) {
         <div className="min-h-screen space-y-3">
           <div className="flex flex-row space-x-5">
             <div className="flex flex-col px-2 space-y-3 w-1/6">
-              {/* <Link href="/user-dashboard/my-company" passHref={true}>
+              <Link href="/user-dashboard/my-company" passHref={true}>
                 <button
                   className={clsx(
                     activeIndex == 0
@@ -19,7 +19,7 @@ export default function UserLayout({ children, activeIndex }) {
                 >
                   My Company
                 </button>
-              </Link> */}
+              </Link>
               <Link href="/user-dashboard/my-show" passHref={true}>
                 <button
                   className={clsx(

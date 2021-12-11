@@ -48,16 +48,15 @@ export default function TestContract() {
 
   const handleCreateTicket = async (prefix) => {
     const contractName = `${prefix}.${process.env.CONTRACT_NAME}`;
-    const { walletConnection, accountId, contract, account } =
-      await connectContract(contractName);
+    const contract = await connectContract(contractName);
 
-    if (!walletConnection.isSignedIn()) {
-      walletConnection.requestSignIn({
-        contractId: contractName,
-        successUrl: `${process.env.domain}/user-dashboard`,
-        failureUrl: process.env.domain,
-      });
-    }
+    // if (!walletConnection.isSignedIn()) {
+    //   walletConnection.requestSignIn({
+    //     contractId: contractName,
+    //     successUrl: `${process.env.domain}/user-dashboard`,
+    //     failureUrl: process.env.domain,
+    //   });
+    // }
 
     await contract.create_new_show({
       show_id: "son_tung_mtp_2",

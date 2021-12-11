@@ -2,7 +2,7 @@ const { utils } = require("near-api-js");
 
 module.exports = {
   images: {
-    domains: ["dummyimage.com"],
+    domains: ["dummyimage.com", "picsum.photos"],
   },
   reactStrictMode: true,
   env: {

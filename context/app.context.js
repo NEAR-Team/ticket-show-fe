@@ -44,12 +44,14 @@ const AppProvider = ({ children }) => {
         owner_id: accountId,
       });
       if (company.length > 0) {
-        return connectContract(company[0]);
+        const _contract = await connectContract(company[0]);
+        return _contract;
       }
     }
   };
 
   const connectContract = async (contractName) => {
+    console.log(contractName);
     const near = await connect(
       Object.assign(
         { deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } },
@@ -71,7 +73,7 @@ const AppProvider = ({ children }) => {
       changeMethods: ["create_new_show", "buy_ticket", "check_ticket"],
     });
 
-    setTicketContract(contract);
+    // setTicketContract(contract);
     return contract;
   };
 

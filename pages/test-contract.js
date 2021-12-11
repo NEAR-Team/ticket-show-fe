@@ -94,12 +94,11 @@ export default function TestContract() {
     );
   };
 
-  const handleGetShowMetadata = async (prefix, show_id) => {
-    const contractName = `${prefix}.${process.env.CONTRACT_NAME}`;
-    const { walletConnection, accountId, contract, account } =
-      await connectContract(contractName);
+  const handleGetShowMetadata = async () => {
+    const contractName = `ticket.${process.env.CONTRACT_NAME}`;
+    const contract = await connectContract(contractName);
 
-    const result = await contract.show_metadata({ show_id });
+    const result = await contract.show_metadata({ show_id: "1639190491" });
     console.log(result);
   };
 
@@ -138,7 +137,7 @@ export default function TestContract() {
           </button>
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() => handleGetShowMetadata("show1", "son_tung_mtp_2")}
+            onClick={() => handleGetShowMetadata()}
           >
             Get Show Metadata
           </button>

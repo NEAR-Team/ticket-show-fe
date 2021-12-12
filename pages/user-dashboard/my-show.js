@@ -47,12 +47,18 @@ export default function MyShow() {
 
   const getMyShow = useCallback(async () => {
     if (accountId) {
-      const result = await fetch(`/api/shows?owner_id=${accountId}`).then(
-        (res) => res.json()
-      );
-      setShows(result);
+      // const result = await fetch(`/api/shows?owner_id=${accountId}`).then(
+      //   (res) => res.json()
+      // );
+      if (!ticketContract) {
+        const _ticketContract = await getContractTicket();
+        const result = await _ticketContract.get_all_shows();
+        setShows(result);
+      }
+
+      // setShows(result);
     }
-  }, [accountId]);
+  }, [accountId, getContractTicket, ticketContract]);
 
   const getCompany = useCallback(async () => {
     if (mainContract && accountId) {
@@ -97,15 +103,16 @@ export default function MyShow() {
         dayjs(data.selling_start_time).unix() + "000000000"
       ),
     };
+    console.log(submitData);
     try {
       setLoading(true);
-      await fetch("/api/shows", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...submitData, owner_id: accountId }),
-      }).then((res) => res.json());
+      // await fetch("/api/shows", {
+      //   method: "post",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ ...submitData, owner_id: accountId }),
+      // }).then((res) => res.json());
 
       await ticketContract.create_new_show(submitData);
       toast.success("Show created successfully");
@@ -215,7 +222,7 @@ export default function MyShow() {
             </div>
             <div className="mb-6">
               <label
-                htmlFor="show_description"
+                htmlFor="selling_start_time"
                 className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
               >
                 Selling start time
@@ -224,12 +231,12 @@ export default function MyShow() {
                 type="date"
                 required
                 className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("show_description")}
+                {...register("selling_start_time")}
               />
             </div>
             <div className="mb-6">
               <label
-                htmlFor="show_description"
+                htmlFor="selling_end_time"
                 className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
               >
                 Selling end time
@@ -238,7 +245,7 @@ export default function MyShow() {
                 type="date"
                 required
                 className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("show_description")}
+                {...register("selling_end_time")}
               />
             </div>
 

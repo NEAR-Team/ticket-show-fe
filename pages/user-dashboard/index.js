@@ -2,6 +2,7 @@ import { useAppContext } from "../../context/app.context";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Button from "@material-tailwind/react/Button";
+import dayjs from "dayjs";
 
 export default function UserDashboard() {
   const { isAuth, mainContract, accountId, connectContract } = useAppContext();
@@ -28,7 +29,7 @@ export default function UserDashboard() {
   const handleCreateCompany = () => {
     mainContract.create_new_ticket_contract(
       {
-        prefix: "ticket",
+        prefix: `ticket_${dayjs().unix()}`,
         metadata: {
           spec: "v0.1",
           name: `Ticket contract for ${accountId}`,

@@ -6,7 +6,7 @@ module.exports = {
   },
   reactStrictMode: true,
   env: {
-    CONTRACT_NAME: "xxxyyyzzz.testnet",
+    CONTRACT_NAME: "saboche.testnet",
     domain: "http://localhost:3000",
     CONTRACT_CREATE_FEE: utils.format.parseNearAmount("8.5"),
   },

@@ -1,6 +1,8 @@
 import { useAppContext } from "../../context/app.context";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
+import Button from "@material-tailwind/react/Button";
+
 export default function UserDashboard() {
   const { isAuth, mainContract, accountId, connectContract } = useAppContext();
   const [company, setCompany] = useState(null);
@@ -23,12 +25,31 @@ export default function UserDashboard() {
     getCompany();
   }, [getCompany]);
 
+  const handleCreateCompany = () => {
+    mainContract.create_new_ticket_contract(
+      {
+        prefix: "ticket",
+        metadata: {
+          spec: "v0.1",
+          name: `Ticket contract for ${accountId}`,
+          symbol: "TIKTOK",
+        },
+      },
+      100000000000000,
+      process.env.CONTRACT_CREATE_FEE
+    );
+  };
+
   return (
     <div className="bg-white py-5">
       <div className="container mx-auto space-y-5 p-5">
-        <h1 className="uppercase text-gray-800 font-medium">User Dashboard</h1>
+        <h1 className="uppercase font-medium text-indigo-500">
+          User Dashboard
+        </h1>
         <div className="h-screen">
-          {!company && <button>tao company</button>}
+          {!company && (
+            <Button onClick={handleCreateCompany}>Begin selling</Button>
+          )}
         </div>
       </div>
     </div>

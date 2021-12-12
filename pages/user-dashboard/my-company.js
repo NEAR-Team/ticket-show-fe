@@ -20,11 +20,10 @@ export default function MyCompany() {
       const company = await mainContract.get_contracts_by_owner({
         owner_id: accountId,
       });
-      console.log(company);
+      if (company.length > 0) {
+        setCompany(company[0]);
+      }
     }
-    // setCompany({
-    //   name: "MTP Entertaiment",
-    // });
   }, [accountId, mainContract]);
 
   useEffect(() => {
@@ -74,10 +73,16 @@ export default function MyCompany() {
       <div className="space-y-3 border p-5 shadow">
         <div className="flex flex-row justify-between items-center">
           <h1 className="uppercase text-indigo-700 font-medium text-xl">
-            My Company
+            Company contract{" "}
+            <a
+              className="text-gray-800"
+              href={`https://explorer.testnet.near.org/accounts/${company}`}
+            >
+              {company}
+            </a>
           </h1>
         </div>
-        <div className="space-y-3">
+        {/* <div className="space-y-3">
           <div className="flex  w-full p-3">
             <form className="w-1/2" onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6">
@@ -132,7 +137,7 @@ export default function MyCompany() {
               )}
             </form>
           </div>
-        </div>
+        </div> */}
       </div>
     </UserLayout>
   );

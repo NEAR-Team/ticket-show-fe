@@ -78,12 +78,12 @@ const AppProvider = ({ children }) => {
   };
 
   const login = () => {
-    // walletConnection.requestSignIn(nearConfig.contractName);
-    walletConnection.requestSignIn({
-      contractId: nearConfig.contractName,
-      successUrl: `${process.env.domain}/user-dashboard`,
-      failureUrl: process.env.domain,
-    });
+    walletConnection.requestSignIn(nearConfig.contractName, "B-Event App");
+    // walletConnection.requestSignIn({
+    //   contractId: nearConfig.contractName,
+    //   successUrl: `${process.env.domain}/user-dashboard`,
+    //   failureUrl: process.env.domain,
+    // });
   };
 
   const logout = () => {

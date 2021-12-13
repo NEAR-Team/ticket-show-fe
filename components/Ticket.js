@@ -4,12 +4,15 @@ import { useAppContext } from "../context/app.context";
 import { formatDepositAmount, formatNearAmount } from "../utils";
 import NearIcon from "./NearIcon";
 
-export default function Ticket({ ticket, show }) {
-  const { accountId, isAuth, mainContract, connectContract, getContractTicket } = useAppContext();
+export default function Ticket({ ticket, show, company }) {
+  const { isAuth, getContractTicket, connectContract, login } = useAppContext();
   const [ticketContract, setTicketContract] = useState(null);
-  console.log(show);
-  console.log(ticket.price + Number.EPSILON);
-  console.log("Ticket", ticket);
+  const contractAddress = `${company}.${process.env.CONTRACT_NAME}`;
+
+  const loginToTicketContract = useCallback(async () => {
+    await login(contractAddress);
+  }, [login, contractAddress]);
+
   const buyTicket = useCallback(async () => {
     if (!isAuth) {
       alert("You must be logged in to buy tickets");
@@ -17,7 +20,7 @@ export default function Ticket({ ticket, show }) {
     }
     let _ticketContract = ticketContract;
     if (!_ticketContract) {
-      _ticketContract = await getContractTicket();
+      _ticketContract = await connectContract(contractAddress);
       setTicketContract(_ticketContract);
     }
     const deposit = formatDepositAmount(ticket.price);
@@ -31,7 +34,35 @@ export default function Ticket({ ticket, show }) {
     ];
     console.log("buy_ticket params", params);
     return _ticketContract.buy_ticket(...params);
-  }, [isAuth, ticketContract, show.show_id, ticket.ticket_type, ticket.price, getContractTicket]);
+  }, [
+    isAuth,
+    ticketContract,
+    ticket.price,
+    ticket.ticket_type,
+    show.show_id,
+    connectContract,
+    contractAddress,
+  ]);
+  const isNotSoldYet = dayjs(show.selling_start_time / 1_000_000).isAfter(dayjs());
+  const isSoldOutTime = dayjs(show.selling_end_time / 1_000_000).isBefore(dayjs());
+  const isSoldOut = show.supply - show.sold <= 0;
+
+  const buttonText = (() => {
+    if (!isAuth) {
+      return "Login to buy";
+    }
+    if (isNotSoldYet) {
+      return "Not sold yet";
+    }
+    if (isSoldOutTime || isSoldOut) {
+      return "Sold out";
+    }
+    return "Buy Now";
+  })();
+
+  const shouldDisalbeBuy = isNotSoldYet || isSoldOutTime || isSoldOut;
+  const onClickButton = isAuth ? buyTicket : loginToTicketContract;
+
   return (
     <div>
       <div className="relative">
@@ -76,8 +107,10 @@ export default function Ticket({ ticket, show }) {
                   {ticket.supply - ticket.sold}/{ticket.supply}
                 </span>
                 <span>
-                  Ended:{" "}
-                  {dayjs(show.selling_end_time / 1_000_000)
+                  {isNotSoldYet ? "Sell at" : "Ended"}:{" "}
+                  {dayjs(
+                    (isNotSoldYet ? show.selling_start_time : show.selling_end_time) / 1_000_000
+                  )
                     .format("DD/MM/YYYY")
                     .toString()}
                 </span>
@@ -86,11 +119,12 @@ export default function Ticket({ ticket, show }) {
             <div>
               <div className="inline-block mt-2 mr-2">
                 <button
-                  onClick={buyTicket}
+                  disabled={shouldDisalbeBuy}
+                  onClick={onClickButton}
                   type="button"
                   className="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md bg-gradient-to-r from-yellow-400 to-yellow-600 transform duration-100 hover:scale-105"
                 >
-                  Buy Now
+                  {buttonText}
                 </button>
               </div>
             </div>

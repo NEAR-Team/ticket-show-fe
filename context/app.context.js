@@ -4,8 +4,7 @@ import { connect, Contract, keyStores, WalletConnection } from "near-api-js";
 import getConfig from "../config/near.config";
 
 const nearConfig = getConfig(process.env.NODE_ENV || "development");
-
-const AppContext = createContext();
+const AppContext = createContext({});
 export const useAppContext = () => useContext(AppContext);
 
 const AppProvider = ({ children }) => {
@@ -18,10 +17,7 @@ const AppProvider = ({ children }) => {
 
   const initNear = async () => {
     const near = await connect(
-      Object.assign(
-        { deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } },
-        nearConfig
-      )
+      Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig)
     );
     const walletConnection = new WalletConnection(near);
     const account = walletConnection.account();
@@ -53,10 +49,7 @@ const AppProvider = ({ children }) => {
   const connectContract = async (contractName) => {
     console.log(contractName);
     const near = await connect(
-      Object.assign(
-        { deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } },
-        nearConfig
-      )
+      Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig)
     );
     const walletConnection = new WalletConnection(near);
     const account = walletConnection.account();
@@ -77,8 +70,8 @@ const AppProvider = ({ children }) => {
     return contract;
   };
 
-  const login = () => {
-    walletConnection.requestSignIn(nearConfig.contractName, "B-Event App");
+  const login = (contractName) => {
+    walletConnection.requestSignIn(contractName ?? nearConfig.contractName, "B-Event App");
     // walletConnection.requestSignIn({
     //   contractId: nearConfig.contractName,
     //   successUrl: `${process.env.domain}/user-dashboard`,

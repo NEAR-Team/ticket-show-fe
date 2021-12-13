@@ -5,10 +5,12 @@ import "@material-tailwind/react/tailwind.css";
 import "../styles/globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { DefaultSeo } from "next-seo";
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      <DefaultSeo titleTemplate="%s | B-Event" />
       <ToastContainer />
       <AppProvider>
         <>

@@ -10,6 +10,7 @@ module.exports = {
     CONTRACT_NAME: "trongtest.testnet",
     domain: "http://localhost:3000",
     CONTRACT_CREATE_FEE: utils.format.parseNearAmount("8.5"),
+    jsonRpcProvider: "https://rpc.testnet.near.org",
   },
   // async redirects() {
   //   return [

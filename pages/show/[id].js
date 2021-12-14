@@ -6,6 +6,7 @@ import BuyTicket from "../../components/BuyTicket";
 import { Contract, providers } from "near-api-js";
 import { NextSeo } from "next-seo";
 import FourNotFour from "../../components/404";
+import { callPublicRpc } from "../../utils";
 
 export default function ShowPage() {
   const router = useRouter();
@@ -31,28 +32,41 @@ export default function ShowPage() {
 
   const getShowMetadata = useCallback(async () => {
     if (!id || !company) {
-      console.warn(`No show_id or company provided! Skip fetching show metadata.`);
+      console.warn(
+        `No show_id or company provided! Skip fetching show metadata.`
+      );
       return;
     }
     setIsFetching(true);
-    const provider = new providers.JsonRpcProvider(process.env.jsonRpcProvider);
-    const args = Buffer.from(JSON.stringify({ show_id: id })).toString("base64");
 
-    try {
-      const rawResult = await provider.query({
-        request_type: "call_function",
-        account_id: `${company}.${process.env.CONTRACT_NAME}`,
-        method_name: "show_metadata",
-        args_base64: args,
-        finality: "optimistic",
-      });
-      const result = JSON.parse(Buffer.from(rawResult.result).toString());
-      setShowData(result);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setIsFetching(false);
-    }
+    const result = await callPublicRpc(
+      `${company}.${process.env.CONTRACT_NAME}`,
+      "show_metadata",
+      { show_id: id }
+    );
+    setShowData(result);
+    setIsFetching(false);
+
+    // const provider = new providers.JsonRpcProvider(process.env.jsonRpcProvider);
+    // const args = Buffer.from(JSON.stringify({ show_id: id })).toString(
+    //   "base64"
+    // );
+
+    // try {
+    //   const rawResult = await provider.query({
+    //     request_type: "call_function",
+    //     account_id: `${company}.${process.env.CONTRACT_NAME}`,
+    //     method_name: "show_metadata",
+    //     args_base64: args,
+    //     finality: "optimistic",
+    //   });
+    //   const result = JSON.parse(Buffer.from(rawResult.result).toString());
+    //   setShowData(result);
+    // } catch (e) {
+    //   console.log(e);
+    // } finally {
+    //   setIsFetching(false);
+    // }
     // format result
   }, [id, company]);
 
@@ -79,7 +93,9 @@ export default function ShowPage() {
               <h1 className="mb-4 text-3xl font-medium text-gray-900 uppercase title-font sm:text-4xl">
                 {showData.show_title}
               </h1>
-              <p className="mb-8 leading-relaxed">{showData.show_description}</p>
+              <p className="mb-8 leading-relaxed">
+                {showData.show_description}
+              </p>
               <div className="grid max-w-screen-lg gap-6 mx-auto lg:grid-cols-2">
                 {Object.keys(showData.ticket_infos).map((ticket, index) => (
                   <BuyTicket

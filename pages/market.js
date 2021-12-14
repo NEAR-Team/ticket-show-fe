@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import LoadingSection from "../components/LoadingSection";
 import { useAppContext } from "../context/app.context";
+import { callPublicRpc } from "../utils";
 
 export default function MarketPage() {
   const { isAuth, mainContract, connectContract, accountId } = useAppContext();
@@ -11,21 +12,22 @@ export default function MarketPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const getAllShows = useCallback(async () => {
-    if (!isAuth || !accountId) {
-      return;
-    }
-    const contractAddresses = await mainContract.get_ticket_contracts();
+    const contractAddresses = await callPublicRpc(
+      process.env.CONTRACT_NAME,
+      "get_ticket_contracts",
+      {}
+    );
     const showPromises = await Promise.all(
       contractAddresses.map(async (contractAddress) => {
-        const contract = await connectContract(contractAddress);
-        const shows = await contract.get_all_shows();
+        // const contract = await connectContract(contractAddress);
+        const shows = await callPublicRpc(contractAddress, "get_all_shows", {});
         return shows.map((show) => ({ ...show, contractId: contractAddress }));
       })
     );
     const shows = await Promise.all(showPromises);
     setShows(shows.flat());
     setIsLoading(false);
-  }, [isAuth, accountId, mainContract, connectContract]);
+  }, []);
 
   useEffect(() => {
     getAllShows();
@@ -43,7 +45,10 @@ export default function MarketPage() {
             shows.map((show, index) => {
               const contractId = show.contractId.split(".")[0] || "unknown";
               return (
-                <div key={show.show_id} className="w-full p-4 rounded-lg shadow-lg">
+                <div
+                  key={show.show_id}
+                  className="w-full p-4 rounded-lg shadow-lg"
+                >
                   <Link href={`/show/${show.show_id}?company=${contractId}`}>
                     <a className="relative block h-40 overflow-hidden rounded">
                       <Image

@@ -1,67 +1,18 @@
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
-import { useAppContext } from "../context/app.context";
-import { formatDepositAmount, formatNearAmount } from "../utils";
+import { formatNearAmount } from "../utils";
 import NearIcon from "./NearIcon";
+import { useBarcode } from "react-barcodes";
 
-export default function Ticket({ ticket, show, company }) {
-  const { isAuth, getContractTicket, connectContract, login } = useAppContext();
-  const [ticketContract, setTicketContract] = useState(null);
-  const contractAddress = `${company}.${process.env.CONTRACT_NAME}`;
+export default function Ticket({ ticket }) {
+  const price = ticket.ticket_infos[ticket.ticket_type].price;
 
-  const loginToTicketContract = useCallback(async () => {
-    await login(contractAddress);
-  }, [login, contractAddress]);
-
-  const buyTicket = useCallback(async () => {
-    if (!isAuth) {
-      alert("You must be logged in to buy tickets");
-      return;
-    }
-    let _ticketContract = ticketContract;
-    if (!_ticketContract) {
-      _ticketContract = await connectContract(contractAddress);
-      setTicketContract(_ticketContract);
-    }
-    const deposit = formatDepositAmount(ticket.price);
-    const params = [
-      {
-        show_id: show.show_id,
-        ticket_type: ticket.ticket_type,
-      },
-      undefined,
-      deposit,
-    ];
-    console.log("buy_ticket params", params);
-    return _ticketContract.buy_ticket(...params);
-  }, [
-    isAuth,
-    ticketContract,
-    ticket.price,
-    ticket.ticket_type,
-    show.show_id,
-    connectContract,
-    contractAddress,
-  ]);
-  const isNotSoldYet = dayjs(show.selling_start_time / 1_000_000).isAfter(dayjs());
-  const isSoldOutTime = dayjs(show.selling_end_time / 1_000_000).isBefore(dayjs());
-  const isSoldOut = show.supply - show.sold <= 0;
-
-  const buttonText = (() => {
-    if (!isAuth) {
-      return "Login to buy";
-    }
-    if (isNotSoldYet) {
-      return "Not sold yet";
-    }
-    if (isSoldOutTime || isSoldOut) {
-      return "Sold out";
-    }
-    return "Buy Now";
-  })();
-
-  const shouldDisalbeBuy = isNotSoldYet || isSoldOutTime || isSoldOut;
-  const onClickButton = isAuth ? buyTicket : loginToTicketContract;
+  const { inputRef } = useBarcode({
+    value: ticket.ticket_id,
+    options: {
+      background: "transparent",
+      displayValue: false,
+    },
+  });
 
   return (
     <div>
@@ -93,45 +44,24 @@ export default function Ticket({ ticket, show, company }) {
             </linearGradient>
           </defs>
         </svg>
-        <div className="absolute inset-0 flex items-center py-1.5 divide-x-2 divide-gray-300 divide-dashed">
+        <div className="absolute inset-0 flex items-center  py-1.5 divide-x-2 divide-gray-300 divide-dashed">
           <div className="flex flex-col items-start flex-1 w-full h-full p-6 m-6">
-            <h3 className="w-full text-3xl font-extrabold text-left truncate">{show.show_title}</h3>
-            <p className="w-full text-left">{show.show_description}</p>
+            <h3 className="w-full text-3xl font-extrabold text-left truncate">
+              {ticket.show_title}
+            </h3>
+            <p className="w-full text-left">{ticket.show_description}</p>
             <div className="flex items-end justify-between w-full my-2">
               <div className="flex items-center">
-                <span className="text-4xl">{formatNearAmount(ticket.price)}</span>
+                <span className="text-4xl">{formatNearAmount(price)}</span>
                 <NearIcon className="ml-2 w-7 h-7" />
-              </div>
-              <div className="flex flex-col items-end justify-end text-gray-500">
-                <span className="text-xl font-bold">
-                  {ticket.supply - ticket.sold}/{ticket.supply}
-                </span>
-                <span>
-                  {isNotSoldYet ? "Sell at" : "Ended"}:{" "}
-                  {dayjs(
-                    (isNotSoldYet ? show.selling_start_time : show.selling_end_time) / 1_000_000
-                  )
-                    .format("DD/MM/YYYY")
-                    .toString()}
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="inline-block mt-2 mr-2">
-                <button
-                  disabled={shouldDisalbeBuy}
-                  onClick={onClickButton}
-                  type="button"
-                  className="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md bg-gradient-to-r from-yellow-400 to-yellow-600 transform duration-100 hover:scale-105"
-                >
-                  {buttonText}
-                </button>
               </div>
             </div>
           </div>
           <div className="flex items-center justify-center flex-shrink-0 w-20 h-full pr-9">
             <div className="text-3xl font-semibold uppercase">
-              <div className="rotate-90">{ticket.ticket_type}</div>
+              <div className="rotate-90">
+                <svg className="w-44" ref={inputRef} />
+              </div>
             </div>
           </div>
         </div>

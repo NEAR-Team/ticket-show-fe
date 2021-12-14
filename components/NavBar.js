@@ -10,6 +10,29 @@ export default function NavBar() {
   const [active, setActive] = useState(false);
   const [scroll, setScroll] = useState(false);
 
+  const navigationLinks = [
+    {
+      title: "Home",
+      href: "/",
+    },
+    {
+      title: "White Paper",
+      href: "/white-paper",
+    },
+    {
+      title: "About",
+      href: "/about",
+    },
+    {
+      title: "Market",
+      href: "/market",
+    },
+    {
+      title: "My Ticket",
+      href: "/my-tickets",
+    },
+  ];
+
   const router = useRouter();
   const handleClick = () => {
     setActive(!active);
@@ -89,36 +112,25 @@ export default function NavBar() {
           )}
         >
           <ul className="items-center justify-end flex-1 list-reset lg:flex">
-            <li className="mr-3">
-              <Link passHref href="/">
-                <a
-                  className="inline-block px-4 py-2 font-bold no-underline"
-                  href="#"
+            {navigationLinks.map((navigationLink, index) => {
+              const isActive = router.pathname === navigationLink.href;
+              return (
+                <li
+                  className={clsx(
+                    "mr-3",
+                    isActive && scroll && "text-red-500",
+                    isActive && !scroll && "text-yellow-400"
+                  )}
+                  key={index}
                 >
-                  Home
-                </a>
-              </Link>
-            </li>
-            <li className="mr-3">
-              <Link passHref href="/white-paper">
-                <a
-                  className="inline-block px-4 py-2 no-underline hover:text-gray-800 hover:text-underline"
-                  href="#"
-                >
-                  White Paper
-                </a>
-              </Link>
-            </li>
-            <li className="mr-3">
-              <Link passHref href="/about">
-                <a
-                  className="inline-block px-4 py-2 no-underline hover:text-gray-800 hover:text-underline"
-                  href="#"
-                >
-                  About
-                </a>
-              </Link>
-            </li>
+                  <Link passHref href={navigationLink.href}>
+                    <a className="inline-block px-4 py-2 font-bold no-underline" href="#">
+                      {navigationLink.title}
+                    </a>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
           <button
             id="navAction"

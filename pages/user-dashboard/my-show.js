@@ -51,6 +51,7 @@ export default function MyShow() {
       // );
       if (!ticketContract) {
         const _ticketContract = await getContractTicket();
+        setTicketContract(_ticketContract);
         const result = await _ticketContract.get_all_shows();
         setShows(result);
       }
@@ -111,6 +112,8 @@ export default function MyShow() {
     }
   };
 
+  const contractId = ticketContract?.contractId.split(".")[0] || "unknown";
+
   return (
     <UserLayout activeIndex={1}>
       <div className="p-5 space-y-3 border shadow">
@@ -129,7 +132,7 @@ export default function MyShow() {
                     shows.length > 0 &&
                     shows.map((show, index) => (
                       <div key={show.show_id} className="w-full p-4">
-                        <Link href={`/show/${show.show_id}`}>
+                        <Link href={`/show/${show.show_id}?company=${contractId}`}>
                           <a className="relative block h-40 overflow-hidden rounded">
                             <Image
                               alt="ecommerce"

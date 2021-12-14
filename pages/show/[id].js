@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../../context/app.context";
-import Ticket from "../../components/Ticket";
+import BuyTicket from "../../components/BuyTicket";
 import { Contract, providers } from "near-api-js";
 import { NextSeo } from "next-seo";
 import FourNotFour from "../../components/404";
@@ -82,7 +82,7 @@ export default function ShowPage() {
               <p className="mb-8 leading-relaxed">{showData.show_description}</p>
               <div className="grid max-w-screen-lg gap-6 mx-auto lg:grid-cols-2">
                 {Object.keys(showData.ticket_infos).map((ticket, index) => (
-                  <Ticket
+                  <BuyTicket
                     company={company}
                     show={showData}
                     ticket={showData.ticket_infos[ticket]}

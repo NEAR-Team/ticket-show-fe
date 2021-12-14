@@ -7,9 +7,10 @@ module.exports = {
   reactStrictMode: true,
   env: {
     // CONTRACT_NAME: "saboche.testnet",
-    CONTRACT_NAME: "trongtest.testnet",
+    CONTRACT_NAME: "show1.trongtest1.testnet",
     domain: "http://localhost:3000",
     CONTRACT_CREATE_FEE: utils.format.parseNearAmount("8.5"),
+    TICKET_PREPARE_GAS: utils.format.parseNearAmount("0.1"),
     jsonRpcProvider: "https://rpc.testnet.near.org",
   },
   // async redirects() {

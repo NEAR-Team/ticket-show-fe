@@ -14,6 +14,7 @@ const AppProvider = ({ children }) => {
   const [mainContract, setMainContract] = useState(null);
   const [walletConnection, setWalletConnection] = useState(null);
   const [ticketContract, setTicketContract] = useState(null);
+  const [triedEager, setTriedEager] = useState(false);
 
   const initNear = async () => {
     const near = await connect(
@@ -22,7 +23,7 @@ const AppProvider = ({ children }) => {
     const walletConnection = new WalletConnection(near);
     const account = walletConnection.account();
     const contract = await new Contract(account, nearConfig.contractName, {
-      viewMethods: ["get_contracts_by_owner"],
+      viewMethods: ["get_contracts_by_owner", "get_ticket_contracts"],
       changeMethods: ["create_new_ticket_contract"],
     });
 
@@ -47,7 +48,7 @@ const AppProvider = ({ children }) => {
   };
 
   const connectContract = async (contractName) => {
-    console.log(contractName);
+    console.log("Connecting to contract:", contractName);
     const near = await connect(
       Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig)
     );
@@ -71,6 +72,9 @@ const AppProvider = ({ children }) => {
   };
 
   const login = (contractName) => {
+    if (!walletConnection) {
+      return;
+    }
     walletConnection.requestSignIn(contractName ?? nearConfig.contractName, "B-Event App");
     // walletConnection.requestSignIn({
     //   contractId: nearConfig.contractName,
@@ -86,15 +90,19 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      initNear().then(({ walletConnection, accountId, contract, account }) => {
-        setWalletConnection(walletConnection);
-        setMainContract(contract);
-        if (walletConnection.isSignedIn()) {
-          setIsAuth(true);
-          setAccountId(accountId);
-          setAccount(account);
-        }
-      });
+      initNear()
+        .then(({ walletConnection, accountId, contract, account }) => {
+          setWalletConnection(walletConnection);
+          setMainContract(contract);
+          if (walletConnection.isSignedIn()) {
+            setIsAuth(true);
+            setAccountId(accountId);
+            setAccount(account);
+          }
+        })
+        .finally(() => {
+          setTriedEager(true);
+        });
     }
   }, []);
 
@@ -112,6 +120,7 @@ const AppProvider = ({ children }) => {
         walletConnection,
         ticketContract,
         getContractTicket,
+        triedEager,
       }}
     >
       {children}

@@ -44,16 +44,18 @@ export default function MyTicket() {
   }, [triedEager, isAuth, login, accountId]);
 
   return (
-    <div className="max-w-screen-xl mx-auto">
-      {isLoading ? (
-        <LoadingSection />
-      ) : (
-        <div className="grid grid-cols-1 gap-4 py-20 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-          {tickets.map((ticket) => (
-            <Ticket key={ticket.ticket_id} ticket={ticket} />
-          ))}
-        </div>
-      )}
+    <div className="bg-white">
+      <div className="max-w-screen-xl mx-auto ">
+        {isLoading ? (
+          <LoadingSection />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 px-4 py-20 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+            {tickets.map((ticket) => (
+              <Ticket key={ticket.ticket_id} ticket={ticket} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

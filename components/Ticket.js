@@ -1,19 +1,10 @@
 import dayjs from "dayjs";
 import { formatNearAmount } from "../utils";
 import NearIcon from "./NearIcon";
-import { useBarcode } from "react-barcodes";
 
 export default function Ticket({ ticket }) {
   const price = ticket.ticket_infos[ticket.ticket_type].price;
-
-  const { inputRef } = useBarcode({
-    value: ticket.ticket_id,
-    options: {
-      background: "transparent",
-      displayValue: false,
-    },
-  });
-
+  console.log(ticket);
   return (
     <div>
       <div className="relative">
@@ -44,24 +35,41 @@ export default function Ticket({ ticket }) {
             </linearGradient>
           </defs>
         </svg>
-        <div className="absolute inset-0 flex items-center  py-1.5 divide-x-2 divide-gray-300 divide-dashed">
-          <div className="flex flex-col items-start flex-1 w-full h-full p-6 m-6">
-            <h3 className="w-full text-3xl font-extrabold text-left truncate">
+        <div className="absolute inset-0 flex max-w-full items-center py-1.5 divide-x-2 divide-gray-300 divide-dashed">
+          <div className="flex flex-col items-start w-full min-w-0 px-8 py-6 lg:px-10">
+            <h3 className="w-full text-xl font-extrabold text-left truncate lg:text-2xl">
               {ticket.show_title}
             </h3>
-            <p className="w-full text-left">{ticket.show_description}</p>
+            <p className="w-full text-left truncate">{ticket.show_description}</p>
             <div className="flex items-end justify-between w-full my-2">
               <div className="flex items-center">
                 <span className="text-4xl">{formatNearAmount(price)}</span>
                 <NearIcon className="ml-2 w-7 h-7" />
               </div>
+              <div className="flex flex-col items-end justify-end text-gray-500">
+                <span className="text-xs lg:text-base">
+                  {"Ended"}:{" "}
+                  {dayjs(ticket.selling_end_time / 1_000_000)
+                    .format("DD/MM/YYYY")
+                    .toString()}
+                </span>
+              </div>
+            </div>
+            <div>
+              <div className="inline-block mr-2 lg:mt-2">
+                <button
+                  type="button"
+                  className="px-8 py-2 text-sm text-white duration-100 transform rounded-lg focus:outline-none lg:py-2 lg:px-12 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:scale-105"
+                >
+                  SELL
+                </button>
+              </div>
             </div>
           </div>
-          <div className="flex items-center justify-center flex-shrink-0 w-20 h-full pr-9">
-            <div className="text-3xl font-semibold uppercase">
-              <div className="rotate-90">
-                <svg className="w-44" ref={inputRef} />
-              </div>
+
+          <div className="flex items-center justify-center flex-shrink-0 h-full overflow-hidden w-14 lg:w-16">
+            <div className="-ml-6 text-2xl font-semibold uppercase rotate-90 lg:text-3xl">
+              <div className="">{ticket.ticket_type}</div>
             </div>
           </div>
         </div>

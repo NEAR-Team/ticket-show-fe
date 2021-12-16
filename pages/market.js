@@ -45,16 +45,13 @@ export default function MarketPage() {
             shows.map((show, index) => {
               const contractId = show.contractId.split(".")[0] || "unknown";
               return (
-                <div
-                  key={show.show_id}
-                  className="w-full p-4 rounded-lg shadow-lg"
-                >
+                <div key={show.show_id} className="w-full p-4 rounded-lg shadow-lg">
                   <Link href={`/show/${show.show_id}?company=${contractId}`}>
                     <a className="relative block h-40 overflow-hidden rounded">
                       <Image
                         alt="ecommerce"
                         className="block object-cover object-center w-full h-full"
-                        src="https://dummyimage.com/420x260"
+                        src={show.show_banner || "https://dummyimage.com/420x260"}
                         width={420}
                         height={260}
                       />

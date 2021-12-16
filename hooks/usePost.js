@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 
-axios.defaults.baseURL = `${process.env.domain}/api`;
+axios.defaults.baseURL = `/api`;
 
 function usePost(url) {
   const [data, setData] = useState(null);

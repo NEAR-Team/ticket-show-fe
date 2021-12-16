@@ -1,6 +1,6 @@
 import UserLayout from "../../components/UserLayout";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { createRef, useCallback, useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { MdModeEditOutline } from "react-icons/md";
@@ -19,18 +19,12 @@ import CssLoading from "../../components/Loading";
 import usePost from "../../hooks/usePost";
 
 export default function MyShow() {
-  const {
-    accountId,
-    isAuth,
-
-    mainContract,
-    connectContract,
-    getContractTicket,
-  } = useAppContext();
+  const { accountId, isAuth, mainContract, connectContract, getContractTicket } = useAppContext();
   const [shows, setShows] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [ticketContract, setTicketContract] = useState(null);
-  const { mutate, loading } = usePost("/shows");
+  const { upload, loading } = usePost("/upload");
+  const fileInputRef = createRef();
 
   const {
     register,
@@ -53,6 +47,7 @@ export default function MyShow() {
         const _ticketContract = await getContractTicket();
         setTicketContract(_ticketContract);
         const result = await _ticketContract.get_all_shows();
+        console.log(result);
         setShows(result);
       }
 
@@ -83,25 +78,33 @@ export default function MyShow() {
     setShowModal(true);
   };
 
+  const handleSelectImage = useCallback(() => {
+    console.log("handleSelectImage", fileInputRef);
+    fileInputRef.current?.click();
+  }, [fileInputRef]);
+
   const onSubmit = async (data) => {
     if (!isAuth) {
       toast.warning("You need to login to create a show");
       return;
     }
 
-    const submitData = {
-      show_id: dayjs().unix().toString(),
-      show_title: data.show_title,
-      show_description: data.show_description,
-      ticket_types: data.ticket.map((t) => t.ticket_type),
-      tickets_supply: data.ticket.map((t) => Number(t.ticket_quantity)),
-      ticket_prices: data.ticket.map((t) => Number(t.ticket_price)),
-      selling_end_time: Number(dayjs(data.selling_end_time).unix() + "000000000"),
-      selling_start_time: Number(dayjs(data.selling_start_time).unix() + "000000000"),
-    };
-    console.log(submitData);
     try {
-      await mutate({ ...submitData, owner_id: accountId, contract: ticketContract.contractId });
+      // await mutate({ ...submitData, owner_id: accountId, contract: ticketContract.contractId });
+      const res = await upload(data.image[0]);
+      const submitData = {
+        show_id: dayjs().unix().toString(),
+        show_title: data.show_title,
+        show_description: data.show_description,
+        ticket_types: data.ticket.map((t) => t.ticket_type),
+        tickets_supply: data.ticket.map((t) => Number(t.ticket_quantity)),
+        ticket_prices: data.ticket.map((t) => Number(t.ticket_price)),
+        selling_end_time: Number(dayjs(data.selling_end_time).unix() + "000000000"),
+        selling_start_time: Number(dayjs(data.selling_start_time).unix() + "000000000"),
+        show_time: Number(dayjs(data.show_time).unix() + "000000000"),
+        show_banner: res.url,
+      };
+      console.log(submitData);
       await ticketContract.create_new_show(submitData);
       toast.success("Show created successfully");
       setShowModal(false);
@@ -137,7 +140,7 @@ export default function MyShow() {
                             <Image
                               alt="ecommerce"
                               className="block object-cover object-center w-full h-full"
-                              src="https://dummyimage.com/420x260"
+                              src={show.show_banner || "https://dummyimage.com/420x260"}
                               width={420}
                               height={260}
                             />
@@ -167,118 +170,153 @@ export default function MyShow() {
           </div>
         </div>
       </div>
-      <Modal size="lg" active={showModal} toggler={() => setShowModal(false)}>
+      <Modal size="xl" active={showModal} toggler={() => setShowModal(false)}>
         <ModalHeader toggler={() => setShowModal(false)}>Create new show</ModalHeader>
         <ModalBody>
-          <form id="hook-form" className="w-96" onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-6">
-              <label
-                htmlFor="show_title"
-                className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                Title
-              </label>
-              <input
-                type="text"
-                placeholder="MTP Entertaiment"
-                required
-                className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("show_title")}
-              />
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="show_description"
-                className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                Desciption
-              </label>
-              <input
-                type="text"
-                required
-                className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("show_description")}
-              />
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="selling_start_time"
-                className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                Selling start time
-              </label>
-              <input
-                type="date"
-                required
-                className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("selling_start_time")}
-              />
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="selling_end_time"
-                className="block mb-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                Selling end time
-              </label>
-              <input
-                type="date"
-                required
-                className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                {...register("selling_end_time")}
-              />
-            </div>
+          <form
+            id="hook-form"
+            className="grid max-w-screen-md gap-6 lg:grid-cols-2"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className="">
+              <div className="mb-6">
+                <label htmlFor="show_title" className="block mb-2 text-sm text-gray-600">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="MTP Entertaiment"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("show_title")}
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="show_description" className="block mb-2 text-sm text-gray-600 ">
+                  Desciption
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("show_description")}
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="show_time" className="block mb-2 text-sm text-gray-600 ">
+                  Show start time
+                </label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("show_time")}
+                />
+              </div>
+              <div className="">
+                <label className="block mb-2 text-sm text-gray-600 ">Show image</label>
 
-            {fields.map((field, index) => (
-              <div className="mb-6" key={index}>
-                <div className="flex flex-row items-center space-x-1">
-                  <div>
-                    <label className="block mb-2 text-sm text-gray-600 dark:text-gray-400">
-                      Type
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                      {...register(`ticket.${index}.ticket_type`)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm text-gray-600 dark:text-gray-400">
-                      Quantity
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                      {...register(`ticket.${index}.ticket_quantity`)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm text-gray-600 dark:text-gray-400">
-                      Price
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                      {...register(`ticket.${index}.ticket_price`)}
-                    />
+                <div role="presentation" onClick={handleSelectImage} className="cursor-pointer">
+                  <Image
+                    alt="ecommerce"
+                    className="block object-cover object-center w-full h-full rounded-lg"
+                    src="https://dummyimage.com/420x260"
+                    width={420}
+                    height={260}
+                  />
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("image")}
+                />
+              </div>
+            </div>
+            <div className="-mt-1">
+              <div className="mb-6">
+                <label htmlFor="selling_start_time" className="block mb-2 text-sm text-gray-600 ">
+                  Selling start time
+                </label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("selling_start_time")}
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="selling_end_time" className="block mb-2 text-sm text-gray-600 ">
+                  Selling end time
+                </label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                  {...register("selling_end_time")}
+                />
+              </div>
+
+              {fields.map((field, index) => (
+                <div className="mb-6" key={index}>
+                  <div className="flex flex-row items-center space-x-1">
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-600">Type</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                        {...register(`ticket.${index}.ticket_type`)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-600">Quantity</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                        {...register(`ticket.${index}.ticket_quantity`)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-600 ">Price</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
+                        {...register(`ticket.${index}.ticket_price`)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            <Button type="button" onClick={() => append({})}>
-              Add ticket
-            </Button>
+              ))}
+              <Button
+                color="lightBlue"
+                buttonType="filled"
+                size="regular"
+                ripple="light"
+                onClick={() => append({})}
+              >
+                Add ticket
+              </Button>
+            </div>
           </form>
         </ModalBody>
         <ModalFooter>
-          <Button color="red" buttonType="link" onClick={(e) => setShowModal(false)} ripple="dark">
+          <Button color="red" buttonType="link" onClick={(e) => setShowModal(false)}>
             Close
           </Button>
 
-          <Button color="green" type="submit" form="hook-form" ripple="light">
+          <Button
+            type="submit"
+            color="teal"
+            className="bg-[#009687]"
+            buttonType="filled"
+            size="regular"
+            ripple="light"
+            form="hook-form"
+          >
             {loading && <CssLoading className="font-sm" />} Save
           </Button>
         </ModalFooter>

@@ -8,13 +8,37 @@ function usePost(url) {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
+  const upload = useCallback(
+    async (file) => {
+      setLoading("loading...");
+      setData(null);
+      setError(null);
+      const body = new FormData();
+      body.append("file", file);
+      return axios
+        .post(url, body)
+        .then((res) => {
+          setLoading(false);
+          //checking for multiple responses for more flexibility
+          //with the url we send in.
+          res.data && setData(res.data);
+          return res.data;
+        })
+        .catch((err) => {
+          setLoading(false);
+          setError("An error occurred. Awkward..");
+        });
+    },
+    [url]
+  );
+
   const mutate = useCallback(
     async (body) => {
       setLoading("loading...");
       setData(null);
       setError(null);
       // const source = axios.CancelToken.source();
-      axios
+      return axios
         .post(url, body)
         .then((res) => {
           setLoading(false);
@@ -34,7 +58,7 @@ function usePost(url) {
     [url]
   );
 
-  return { data, loading, error, mutate };
+  return { data, loading, error, mutate, upload };
 }
 
 export default usePost;

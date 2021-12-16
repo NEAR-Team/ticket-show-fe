@@ -63,6 +63,8 @@ export default function BuyTicket({ ticket, show, company }) {
   const shouldDisalbeBuy = isNotSoldYet || isSoldOutTime || isSoldOut;
   const onClickButton = isAuth ? buyTicket : loginToTicketContract;
 
+  console.log(show);
+
   return (
     <div className="relative flex flex-1">
       <svg viewBox="0 0 666 326" fill="none" xmlns="http://www.w3.org/2000/svg">

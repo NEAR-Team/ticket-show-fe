@@ -82,7 +82,7 @@ function Ticket({ ticket }) {
 
 export default function Tickets({ tickets }) {
   return (
-    <div className="grid grid-cols-1 gap-4 py-4 mb-8 lg:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 px-4 py-4 mb-8 lg:grid-cols-2 xl:grid-cols-3">
       {tickets.map((ticket, index) => (
         <Ticket key={index} ticket={ticket} />
       ))}

@@ -2,8 +2,8 @@ import dayjs from "dayjs";
 import { formatNearAmount } from "../utils";
 import NearIcon from "./NearIcon";
 
-export default function Ticket({ ticket }) {
-  const price = ticket.ticket_infos[ticket.ticket_type].price;
+function Ticket({ ticket }) {
+  const price = ticket.show.ticket_infos[ticket.ticket_type].price;
 
   return (
     <div>
@@ -38,10 +38,10 @@ export default function Ticket({ ticket }) {
         <div className="absolute inset-0 flex max-w-full items-center py-1.5 divide-x-2 divide-gray-300 divide-dashed overflow-hidden">
           <div className="flex flex-col items-start w-full min-w-0 px-8 py-6 lg:px-10">
             <h3 className="w-full text-xl font-extrabold text-left truncate lg:text-2xl">
-              {ticket.show_title}
+              {ticket.show.show_title}
             </h3>
             <p className="w-full text-left truncate">
-              {ticket.show_description || "No description provided"}
+              {ticket.show.show_description || "No description provided"}
             </p>
             <div className="flex items-end justify-between w-full my-2">
               <div className="flex items-center">
@@ -51,7 +51,7 @@ export default function Ticket({ ticket }) {
               <div className="flex flex-col items-end justify-end text-gray-500">
                 <span className="text-xs lg:text-base">
                   {"Show time"}:{" "}
-                  {dayjs(ticket.show_time / 1_000_000)
+                  {dayjs(ticket.show.show_time / 1_000_000)
                     .format("DD/MM/YYYY")
                     .toString()}
                 </span>
@@ -76,6 +76,16 @@ export default function Ticket({ ticket }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function Tickets({ tickets }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 py-4 mb-8 lg:grid-cols-2 xl:grid-cols-3">
+      {tickets.map((ticket, index) => (
+        <Ticket key={index} ticket={ticket} />
+      ))}
     </div>
   );
 }

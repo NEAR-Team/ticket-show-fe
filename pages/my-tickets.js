@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { useRef } from "react/cjs/react.production.min";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import LoadingSection from "../components/LoadingSection";
-import Ticket from "../components/Ticket";
+import Tickets from "../components/Ticket";
 import { useAppContext } from "../context/app.context";
 
 export default function MyTicket() {
@@ -17,15 +16,7 @@ export default function MyTicket() {
 
     const promises = contracts.map(async (contractAddress) => {
       const contract = await connectContract(contractAddress);
-      const contractTickets = await contract.get_tickets_by_owner({ owner: accountId });
-      const ticketPromises = contractTickets.map(async (contractTicket) => {
-        const showMetadata = await contract.show_metadata({ show_id: contractTicket.show_id });
-        return {
-          ...contractTicket,
-          ...showMetadata,
-        };
-      });
-      return Promise.all(ticketPromises);
+      return contract.get_tickets_by_owner({ owner: accountId });
     });
     const tickets = await Promise.all(promises);
     setTickets(tickets.flat());
@@ -43,16 +34,46 @@ export default function MyTicket() {
     }
   }, [triedEager, isAuth, login, accountId]);
 
+  console.log("tickets", tickets);
+
+  const isUsed = (ticket) => ticket.is_used;
+
+  const ticketsToShow = useMemo(() => {
+    const result = {
+      used: [],
+      notUsed: [],
+    };
+    tickets.forEach((ticket) => {
+      if (isUsed(ticket)) {
+        result.used.unshift(ticket);
+      } else {
+        result.notUsed.unshift(ticket);
+      }
+    });
+    return result;
+  }, [tickets]);
+
   return (
     <div className="bg-white">
       <div className="max-w-screen-xl mx-auto ">
         {isLoading ? (
           <LoadingSection />
         ) : (
-          <div className="grid grid-cols-1 gap-4 px-4 py-20 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-            {tickets.map((ticket) => (
-              <Ticket key={ticket.ticket_id} ticket={ticket} />
-            ))}
+          <div className="py-20">
+            {ticketsToShow.notUsed.length > 0 && (
+              <div className="flex items-end justify-between px-4 lg:px-0">
+                <h3 className="text-3xl font-bold text-gray-600 md:px-0 ">NOT USED</h3>
+              </div>
+            )}
+            <Tickets tickets={ticketsToShow.notUsed} />
+            <div className="py-20">
+              {ticketsToShow.used.length > 0 && (
+                <div className="flex items-end justify-between px-4 lg:px-0">
+                  <h3 className="text-3xl font-bold text-gray-600 md:px-0 ">USED</h3>
+                </div>
+              )}
+              <Tickets tickets={ticketsToShow.used} />
+            </div>
           </div>
         )}
       </div>

@@ -40,11 +40,11 @@ export default function MarketPage() {
     };
     shows.forEach((show) => {
       if (isNotSoldYet(show)) {
-        result.selling.push(show);
+        result.preparing.unshift(show);
       } else if (isSoldOutTime(show)) {
-        result.ended.push(show);
+        result.ended.unshift(show);
       } else {
-        result.preparing.push(show);
+        result.selling.unshift(show);
       }
     });
     return result;
@@ -58,17 +58,32 @@ export default function MarketPage() {
         ) : (
           <div className="py-20">
             {showsToShow.selling.length > 0 && (
-              <h3 className="px-4 text-3xl font-bold text-gray-600 md:px-0 ">Selling</h3>
+              <div className="flex items-end justify-between px-4 lg:px-0">
+                <h3 className="text-3xl font-bold text-gray-600">Selling</h3>
+                <span className="text-xl text-yellow-500 cursor-pointer hover:text-yellow-600">
+                  View all
+                </span>
+              </div>
             )}
-            <Shows shows={showsToShow.selling} />
+            <Shows status="selling" shows={showsToShow.selling.slice(0, 4)} />
             {showsToShow.preparing.length > 0 && (
-              <h3 className="text-3xl font-bold text-gray-600">Preparing</h3>
+              <div className="flex items-end justify-between px-4 lg:px-0">
+                <h3 className="text-3xl font-bold text-gray-600 ">Preparing</h3>
+                <span className="text-xl text-yellow-500 cursor-pointer hover:text-yellow-600">
+                  View all
+                </span>
+              </div>
             )}
-            <Shows shows={showsToShow.preparing} />
+            <Shows status="preparing" shows={showsToShow.preparing.slice(0, 4)} />
             {showsToShow.ended.length > 0 && (
-              <h3 className="text-3xl font-bold text-gray-600">Ended</h3>
+              <div className="flex items-end justify-between px-4 lg:px-0">
+                <h3 className="text-3xl font-bold text-gray-600">Ended</h3>
+                <span className="text-xl text-yellow-500 cursor-pointer hover:text-yellow-600">
+                  View all
+                </span>
+              </div>
             )}
-            <Shows shows={showsToShow.ended} />
+            <Shows status="ended" shows={showsToShow.ended.slice(0, 4)} />
           </div>
         )}
       </div>

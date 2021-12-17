@@ -5,7 +5,7 @@ import { formatNearAmount } from "../utils";
 import Countdown from "./Countdown";
 import NearIcon from "./NearIcon";
 
-function Show({ show }) {
+function Show({ show, status }) {
   const contractId = show.contractId.split(".")[0] || "unknown";
   const ticketInfos = Object.values(show.ticket_infos);
   const minPrice =
@@ -23,7 +23,6 @@ function Show({ show }) {
           ticketInfos.map((ticket) => formatNearAmount(ticket.price))
         );
 
-  console.log(minPrice, maxPrice);
   return (
     <div key={show.show_id} className="w-full p-4 rounded-lg shadow-lg">
       <Link href={`/show/${show.show_id}?company=${contractId}`}>
@@ -55,7 +54,14 @@ function Show({ show }) {
               .toString()}
           </p>
           <p className="mt-1 text-sm">
-            Ended: <Countdown endDate={dayjs(show.selling_end_time / 1_000_000).toISOString()} />
+            {status === "preparing" ? "Start selling" : "Ended"}:{" "}
+            <Countdown
+              endDate={
+                status === "preparing"
+                  ? dayjs(show.selling_start_time / 1_000_000).toISOString()
+                  : dayjs(show.selling_end_time / 1_000_000).toISOString()
+              }
+            />
           </p>
         </div>
       </div>
@@ -63,11 +69,11 @@ function Show({ show }) {
   );
 }
 
-export default function Shows({ shows }) {
+export default function Shows({ shows, status }) {
   return (
     <div className="grid grid-cols-1 gap-4 py-4 mb-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {shows.map((show, index) => (
-        <Show key={index} show={show} />
+        <Show key={index} show={show} status={status} />
       ))}
     </div>
   );

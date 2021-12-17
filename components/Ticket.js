@@ -40,7 +40,9 @@ export default function Ticket({ ticket }) {
             <h3 className="w-full text-xl font-extrabold text-left truncate lg:text-2xl">
               {ticket.show_title}
             </h3>
-            <p className="w-full text-left truncate">{ticket.show_description}</p>
+            <p className="w-full text-left truncate">
+              {ticket.show_description || "No description provided"}
+            </p>
             <div className="flex items-end justify-between w-full my-2">
               <div className="flex items-center">
                 <span className="text-4xl">{formatNearAmount(price)}</span>

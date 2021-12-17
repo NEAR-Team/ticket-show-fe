@@ -1,13 +1,10 @@
 import dayjs from "dayjs";
-import Image from "next/image";
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import LoadingSection from "../components/LoadingSection";
-import { useAppContext } from "../context/app.context";
+import Shows from "../components/Shows";
 import { callPublicRpc } from "../utils";
 
 export default function MarketPage() {
-  const { isAuth, mainContract, connectContract, accountId } = useAppContext();
   const [shows, setShows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,47 +30,47 @@ export default function MarketPage() {
     getAllShows();
   }, [getAllShows]);
 
+  const isNotSoldYet = (show) => dayjs(show.selling_start_time / 1_000_000).isAfter(dayjs());
+  const isSoldOutTime = (show) => dayjs(show.selling_end_time / 1_000_000).isBefore(dayjs());
+  const showsToShow = useMemo(() => {
+    const result = {
+      selling: [],
+      ended: [],
+      preparing: [],
+    };
+    shows.forEach((show) => {
+      if (isNotSoldYet(show)) {
+        result.selling.push(show);
+      } else if (isSoldOutTime(show)) {
+        result.ended.push(show);
+      } else {
+        result.preparing.push(show);
+      }
+    });
+    return result;
+  }, [shows]);
+
   return (
     <div className="bg-white">
       <div className="max-w-screen-xl mx-auto ">
-        <div className="grid grid-cols-1 gap-4 py-20 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-          {isLoading ? (
-            <LoadingSection />
-          ) : (
-            shows &&
-            shows.length > 0 &&
-            shows.map((show, index) => {
-              const contractId = show.contractId.split(".")[0] || "unknown";
-              return (
-                <div key={show.show_id} className="w-full p-4 rounded-lg shadow-lg">
-                  <Link href={`/show/${show.show_id}?company=${contractId}`}>
-                    <a className="relative block h-40 overflow-hidden rounded">
-                      <Image
-                        alt="ecommerce"
-                        className="block object-cover object-center w-full h-full"
-                        src={show.show_banner || "https://dummyimage.com/420x260"}
-                        width={420}
-                        height={260}
-                      />
-                    </a>
-                  </Link>
-                  <div className="space-y-2">
-                    <h2 className="pt-4 text-xl font-semibold text-gray-900 uppercase title-font">
-                      {show.show_title}
-                    </h2>
-                    <p>{show.show_description}</p>
-                    <p className="mt-1 text-sm italic text-right">
-                      End at:{" "}
-                      {dayjs(show.selling_end_time / 1_000_000)
-                        .format("DD/MM/YYYY")
-                        .toString()}
-                    </p>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+        {isLoading ? (
+          <LoadingSection />
+        ) : (
+          <div className="py-20">
+            {showsToShow.selling.length > 0 && (
+              <h3 className="px-4 text-3xl font-bold text-gray-600 md:px-0 ">Selling</h3>
+            )}
+            <Shows shows={showsToShow.selling} />
+            {showsToShow.preparing.length > 0 && (
+              <h3 className="text-3xl font-bold text-gray-600">Preparing</h3>
+            )}
+            <Shows shows={showsToShow.preparing} />
+            {showsToShow.ended.length > 0 && (
+              <h3 className="text-3xl font-bold text-gray-600">Ended</h3>
+            )}
+            <Shows shows={showsToShow.ended} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -93,7 +93,7 @@ export default function BuyTicket({ ticket, show, company }) {
           <h3 className="w-full text-xl font-extrabold text-left truncate lg:text-2xl">
             {show.show_title}
           </h3>
-          <p className="w-full text-left">{show.show_description}</p>
+          <p className="w-full text-left">{ticket.show_description || "No description provided"}</p>
           <div className="flex items-end justify-between w-full my-2">
             <div className="flex items-center">
               <span className="text-4xl">{formatNearAmount(ticket.price)}</span>

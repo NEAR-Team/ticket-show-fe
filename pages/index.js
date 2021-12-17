@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import Slider from "react-slick";
-
+import dayjs from "dayjs";
 import SvgWave from "../components/SvgWave";
 
 import {
@@ -12,6 +12,11 @@ import {
   FcTwoSmartphones,
   FcCustomerSupport,
 } from "react-icons/fc";
+import { useAppContext } from "../context/app.context";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/router";
+import { callPublicRpc } from "../utils";
+import { toast } from "react-toastify";
 
 const settings = {
   infinite: true,
@@ -23,6 +28,47 @@ const settings = {
 };
 
 export default function Home() {
+  const { mainContract, accountId, isAuth, login } = useAppContext();
+
+  const router = useRouter();
+
+  const getCompany = useCallback(async () => {
+    const company = await callPublicRpc(
+      process.env.CONTRACT_NAME,
+      "get_contracts_by_owner",
+      { owner_id: accountId }
+    );
+
+    if (company && company.length > 0) {
+      return true;
+    }
+    return false;
+  }, [accountId]);
+
+  const handleStartSelling = async () => {
+    if (!isAuth) {
+      toast("Please login first");
+      return;
+    }
+    const hasCompany = await getCompany();
+    if (!hasCompany) {
+      mainContract.create_new_ticket_contract(
+        {
+          prefix: `ticket_${dayjs().unix()}`,
+          metadata: {
+            spec: "v0.1",
+            name: `Ticket contract for ${accountId}`,
+            symbol: "TIKTOK",
+          },
+        },
+        process.env.TICKET_PREPARE_GAS,
+        process.env.CONTRACT_CREATE_FEE
+      );
+    } else {
+      router.push("/user-dashboard");
+    }
+  };
+
   return (
     <>
       <div className="pt-24">
@@ -168,7 +214,10 @@ export default function Home() {
               on taking over the world.
             </p>
             <div className="flex justify-center">
-              <button className="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+              <button
+                className="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+                onClick={handleStartSelling}
+              >
                 Start selling ticket
               </button>
               <button className="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-gray-200 rounded text-lg">
